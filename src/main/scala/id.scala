@@ -2,6 +2,24 @@ package eidos
 
 object id {
 
+  sealed abstract case class Id[A](value: String) {
+    protected def label: Label[A]
+
+    override def toString =
+      s"${label.label}${productPrefix}(${value})"
+  }
+
+  object Id {
+    def of[A](v: String)(
+        implicit ev: Label[A] = Label.default[A],
+        validator: Validate[A] = Validate.default[A]): Option[Id[A]] =
+      validator.validate(v) map { s =>
+        new Id[A](v) {
+          override def label = ev
+        }
+      }
+  }
+
   trait Label[A] {
     def label: String
   }
@@ -21,17 +39,15 @@ object id {
     }
   }
 
-  sealed abstract case class Id[A](value: String) {
-    protected def label: Label[A]
-
-    override def toString =
-      s"${label.label}${productPrefix}(${value})"
+  trait Validate[A] {
+    def validate(s: String): Option[String]
   }
 
-  object Id {
-    def of[A](v: String)(implicit ev: Label[A] = Label.default[A]): Id[A] =
-      new Id[A](v) {
-        override def label = ev
-      }
+  object Validate {
+    private[id] def default[A] = new Validate[A] {
+      def validate(v: String) = Option(v)
+
+    }
   }
+
 }

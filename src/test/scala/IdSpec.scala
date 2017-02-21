@@ -37,9 +37,28 @@ class IdSpec extends Specification with TypecheckMatchers {
       }
       type C = C.type
 
-      { Id.of[Device]("gtx9018").toString must beEqualTo("DeviceId(gtx9018)") }
-      { Id.of[B]("simple").toString must beEqualTo("Id(simple)") }
-      { Id.of[C]("custom").toString must beEqualTo("CustomId(custom)") }
+      {
+        Id.of[Device]("gtx9018").get.toString must beEqualTo(
+          "DeviceId(gtx9018)")
+      }
+      { Id.of[B]("simple").get.toString must beEqualTo("Id(simple)") }
+      { Id.of[C]("custom").get.toString must beEqualTo("CustomId(custom)") }
+    }
+
+    "be validated against an optional schema on creation" in {
+      object A
+      type A = A.type
+
+      object B {
+        implicit def validator = new Validate[B] {
+          def validate(v: String) = if (v == "nonvalid") None else Some(v)
+        }
+      }
+      type B = B.type
+
+      { Id.of[A]("whatever") should beSome }
+      { Id.of[B]("whatever") should beSome }
+      { Id.of[B]("nonvalid") should beNone }
     }
   }
 }
