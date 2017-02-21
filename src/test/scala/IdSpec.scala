@@ -5,7 +5,6 @@ import org.specs2.execute.Typecheck._
 import org.specs2.matcher.TypecheckMatchers
 
 class IdSpec extends Specification with TypecheckMatchers {
-  import id._
 
   "eidos IDs" should {
     "be parameterised by a tag" in {
@@ -32,7 +31,7 @@ class IdSpec extends Specification with TypecheckMatchers {
       type B = B.type
 
       object C {
-        implicit def ev = new Label[C]{
+        implicit def ev = new Label[C] {
           def label = "Custom"
         }
       }
