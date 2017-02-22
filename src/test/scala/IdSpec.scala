@@ -37,10 +37,7 @@ class IdSpec extends Specification with TypecheckMatchers {
       }
       type C = C.type
 
-      {
-        Id.of[Device]("gtx9018").toString must beEqualTo(
-          "DeviceId(gtx9018)")
-      }
+      { Id.of[Device]("gtx9018").toString must beEqualTo("DeviceId(gtx9018)") }
       { Id.of[B]("simple").toString must beEqualTo("Id(simple)") }
       { Id.of[C]("custom").toString must beEqualTo("CustomId(custom)") }
     }
@@ -50,9 +47,9 @@ class IdSpec extends Specification with TypecheckMatchers {
       type A = A.type
 
       object B {
-        implicit def validator = new Validate[B] {
-          type Out = Option[Id[B]]
-          def validate(v: String)(implicit ev: Label[B]) = if (v == "nonvalid") None else Some(Id.unsafeCreate(v))
+        implicit def validator = new OptionValidator[B] {
+          def validate(v: String)(implicit ev: Label[B]) =
+            if (v == "nonvalid") None else Some(Id.unsafeCreate(v))
         }
       }
       type B = B.type
