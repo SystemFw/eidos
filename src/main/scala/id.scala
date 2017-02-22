@@ -10,14 +10,6 @@ object id {
   }
 
   object Id {
-    // def of[A](v: String)(
-    //     implicit ev: Label[A] = Label.default[A],
-    //     validator: Validate[A] = Validate.default[A]): Option[Id[A]] =
-    //   validator.validate(v) map { s =>
-    //     new Id[A](v) {
-    //       override def label = ev
-    //     }
-    //   }
     def unsafeCreate[A](v: String)(
         implicit ev: Label[A] = Label.default[A]): Id[A] =
       new Id[A](v) {
@@ -26,8 +18,8 @@ object id {
 
     def of[A](v: String)(
         implicit l: Label[A] = Label.default[A],
-        validator: Validate[A] = Validate.default[A]): validator.Out =
-      validator.validate(v)
+        b: Build[A] = Build.default[A]): b.Out =
+      b.build(v)
   }
 
   trait Label[A] {
@@ -49,21 +41,21 @@ object id {
     }
   }
 
-  sealed trait Validate[A] {
+  sealed trait Build[A] {
     type Out
-    def validate(s: String)(implicit ev: Label[A]): Out
+    def build(s: String)(implicit ev: Label[A]): Out
   }
 
-  object Validate {
-    private[id] def default[A] = new Validate[A] {
+  object Build {
+    private[id] def default[A] = new Build[A] {
       type Out = Id[A]
-      override def validate(v: String)(
+      override def build(v: String)(
           implicit ev: Label[A] = Label.default[A]): Out = Id.unsafeCreate(v)
 
     }
   }
 
-  trait OptionValidator[A] extends Validate[A] {
+  trait Validate[A] extends Build[A] {
     final override type Out = Option[Id[A]]
   }
 

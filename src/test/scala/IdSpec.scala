@@ -47,8 +47,8 @@ class IdSpec extends Specification with TypecheckMatchers {
       type A = A.type
 
       object B {
-        implicit def validator = new OptionValidator[B] {
-          def validate(v: String)(implicit ev: Label[B]) =
+        implicit def validator = new Validate[B] {
+          def build(v: String)(implicit ev: Label[B]) =
             if (v == "nonvalid") None else Some(Id.unsafeCreate(v))
         }
       }
