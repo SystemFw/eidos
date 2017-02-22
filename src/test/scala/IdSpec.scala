@@ -46,17 +46,19 @@ class IdSpec extends Specification with TypecheckMatchers {
       object A
       type A = A.type
 
-      object B {
-        implicit def validator = new Validate[B] {
-          def build(v: String)(implicit ev: Label[B]) =
-            if (v == "nonvalid") None else Some(Id.unsafeCreate(v))
+      case object Device extends MakeLabel {
+        implicit def validator = new Validate[Device] {
+          def validate(v: String) =
+            if (v == "nonvalid") None else Some(v)
         }
       }
-      type B = B.type
+      type Device = Device.type
 
       { typecheck("""val a: Id[A] = Id.of("whatever")""") must succeed }
-      { Id.of[B]("whatever") should beSome }
-      { Id.of[B]("nonvalid") should beNone }
+      {
+        Id.of[Device]("valid").map(_.toString) should beSome("DeviceId(valid)")
+      }
+      { Id.of[Device]("nonvalid") should beNone }
     }
   }
 }
