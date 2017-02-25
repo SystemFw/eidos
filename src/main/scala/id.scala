@@ -56,4 +56,68 @@ object id {
 
     def validate(s: String): Option[String]
   }
+
+  sealed trait Format {
+    def format: String
+
+    val regex = format.r
+
+    implicit final def validator = new Validate[this.type] {
+      def validate(s: String) = s match {
+        case regex(_ *) => Some(s)
+        case _ => None
+      }
+    }
+
+  }
+
+  private[id] sealed trait ValidationFormatDefinitionConflict
+
+  // format: off
+  trait UUID extends Format {
+    //   Every subclass of Format will have this special value, to
+    //   prevent the user from mixing in two different formats at the
+    //   same time. The weird name is a to make the error clear for
+    //   the user.  Note that it can't be moved to the common super
+    //   class (Format), or trait linearisation will kick in, and the
+    //   code will compile when it shouldn't.
+    //   Furthermore, this special def needs to be the first thing
+    //   defined in the trait to appear as the first error message. This
+    //   is clearly a trick, but it's the best we can do (short of
+    //   macros), given that Scala does not have custom errors
+    final def `"In Eidos, You can only extend one validation format at the time!"`
+        : ValidationFormatDefinitionConflict = null
+
+    final override def format = ""
+  }
+
+  trait AlphaNum extends Format {
+    final def `"In Eidos, You can only extend one validation format at the time!"`
+        : ValidationFormatDefinitionConflict = null
+
+    final override def format = ""
+  }
+
+  trait Num extends Format {
+    final def `"In Eidos, You can only extend one validation format at the time!"`
+        : ValidationFormatDefinitionConflict = null
+
+    final override def format = ""
+  }
+
+  trait Regex extends Format {
+    final def `"In Eidos, You can only extend one validation format at the time!"`
+        : ValidationFormatDefinitionConflict = null
+
+    def pattern: String
+
+    final override def format = pattern
+  } // format: on
+
+  case object Device extends MakeLabel with Num
+  type Device = Device.type
+
+  val a: Option[Id[Device]] = Id.of[Device]("hello")
+
+//  case object yo extends UUID with Num with MakeLabel
 }
