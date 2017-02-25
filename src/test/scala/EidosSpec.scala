@@ -4,9 +4,11 @@ import org.specs2.mutable.Specification
 import org.specs2.execute.Typecheck._
 import org.specs2.matcher.TypecheckMatchers
 
-class IdSpec extends Specification with TypecheckMatchers {
+class EidosSpec extends Specification with TypecheckMatchers {
 
-  "eidos IDs" should {
+  "In Eidos:".br.tab(1)
+
+  "IDs" should {
     "be parameterised by a tag" in {
       object A
       type A = A.type
@@ -24,9 +26,6 @@ class IdSpec extends Specification with TypecheckMatchers {
     }
 
     "have an optional label attached to it" in {
-      case object Device extends MakeLabel
-      type Device = Device.type
-
       object B
       type B = B.type
 
@@ -37,28 +36,36 @@ class IdSpec extends Specification with TypecheckMatchers {
       }
       type C = C.type
 
-      { Id.of[Device]("gtx9018").toString must beEqualTo("DeviceId(gtx9018)") }
       { Id.of[B]("simple").toString must beEqualTo("Id(simple)") }
       { Id.of[C]("custom").toString must beEqualTo("CustomId(custom)") }
     }
 
     "be validated against an optional schema on creation" in {
-      object A
-      type A = A.type
+      object NoValidation
+      type NoValidation = NoValidation.type
 
-      case object Device extends MakeLabel {
-        implicit def validator = new Validate[Device] {
+      case object ValidationRequired {
+        implicit def validator = new Validate[ValidationRequired] {
           def validate(v: String) =
             if (v == "nonvalid") None else Some(v)
         }
       }
+      type ValidationRequired = ValidationRequired.type
+
+      // format: off
+      { typecheck("""val a: Id[NoValidation] = Id.of("whatever")""") must succeed }
+      { Id.of[ValidationRequired]("valid").map(_.toString) should beSome("Id(valid)") }
+      { Id.of[ValidationRequired]("nonvalid") should beNone }
+      // format: on
+    }
+  }
+
+  "Labels" should {
+    "be derivable from the tag name" in {
+      case object Device extends MakeLabel
       type Device = Device.type
 
-      { typecheck("""val a: Id[A] = Id.of("whatever")""") must succeed }
-      {
-        Id.of[Device]("valid").map(_.toString) should beSome("DeviceId(valid)")
-      }
-      { Id.of[Device]("nonvalid") should beNone }
+      { Id.of[Device]("gtx9018").toString must beEqualTo("DeviceId(gtx9018)") }
     }
   }
 }
