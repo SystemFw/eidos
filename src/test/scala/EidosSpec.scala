@@ -86,4 +86,18 @@ class EidosSpec extends Specification with TypecheckMatchers {
       { Id.of[Device]("gtx9018").toString must beEqualTo("DeviceId(gtx9018)") }
     }
   }
+
+  "Validation formats" should {
+    "be mutually exclusive" in {
+      // Specs2 cannot currently test this scenario (the compile time
+      // error that Eidos produces is not a type error). To test,
+      // uncomment the following line and ensure it fails at compile time
+      typecheck {
+        """
+        object A extends UUID with Num
+        """
+      } must not succeed
+    }.pendingUntilFixed(": specs2 can't test this scenario")
+    // "allow validation a uuid" and so on for the other formats
+  }
 }
