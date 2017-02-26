@@ -5,8 +5,9 @@ import org.specs2.execute.Typecheck._
 import org.specs2.matcher.TypecheckMatchers
 
 class EidosSpec extends Specification with TypecheckMatchers {
-
   "In Eidos:".br.tab(1)
+
+  import id._
 
   "IDs" should {
     "be parameterised by a tag" in {
@@ -23,6 +24,23 @@ class EidosSpec extends Specification with TypecheckMatchers {
 
       { typecheck("foo(b)") must not succeed }
       { typecheck("foo(a)") must succeed }
+    }
+
+    "be created thorugh an explicitly typed call to `of`" in {
+      // for documentation purposed only
+      // limitation due to  SI-7371 and SI-7234
+      object A
+      type A = A.type
+
+      object B {
+        implicit def v: Validate[B] = null
+      }
+      type B = B.type
+
+      { typecheck("""val a: Id[A] = Id.of[A]("")""") must succeed }
+      { typecheck("""val b: Option[Id[B]] = Id.of[B]("")""") must succeed }
+      { typecheck("""val a: Id[A] = Id.of("")""") must not succeed }
+      { typecheck("""val b: Option[Id[B]] = Id.of("")""") must not succeed }
     }
 
     "have an optional label attached to it" in {
@@ -53,7 +71,7 @@ class EidosSpec extends Specification with TypecheckMatchers {
       type ValidationRequired = ValidationRequired.type
 
       // format: off
-      { typecheck("""val a: Id[NoValidation] = Id.of("whatever")""") must succeed }
+      { typecheck("""val a: Id[NoValidation] = Id.of[NoValidation]("whatever")""") must succeed }
       { Id.of[ValidationRequired]("valid").map(_.toString) should beSome("Id(valid)") }
       { Id.of[ValidationRequired]("nonvalid") should beNone }
       // format: on

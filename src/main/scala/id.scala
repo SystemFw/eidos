@@ -14,6 +14,9 @@ object id {
       override def label = l
     }
 
+    // `of` requires explicit type application due to SI-7371 to SI-7234
+    // merely adding a type signature to the returned value is not enough
+    // one should instead always use Id.of[TypeOfTheTag]
     def of[A](v: String)(implicit l: Label[A] = Label.default[A],
                          b: Build[A] = Build.default[A]): b.Out =
       b.build(v, l)
@@ -42,10 +45,10 @@ object id {
   }
 
   object Build {
+    // Inferred type: default[A]: Build[A]{type Out = Id[A]}
     private[id] def default[A] = new Build[A] {
       type Out = Id[A]
       override def build(v: String, l: Label[A]): Out = Id.unsafeCreate(v, l)
-
     }
   }
 
@@ -113,11 +116,4 @@ object id {
 
     final override def format = pattern
   } // format: on
-
-  case object Device extends MakeLabel with Num
-  type Device = Device.type
-
-  val a: Option[Id[Device]] = Id.of[Device]("hello")
-
-//  case object yo extends UUID with Num with MakeLabel
 }
