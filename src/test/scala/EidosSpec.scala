@@ -99,11 +99,32 @@ class EidosSpec extends Specification with TypecheckMatchers with ScalaCheck {
   }
 
   "Labels" should {
+    "be mutually exclusive" in {
+      // Specs2 cannot currently test this scenario (the compile time
+      // error that Eidos produces is not a type error). To test,
+      // uncomment the following line and ensure it fails at compile time
+      // case object A extends CustomLabel with MakeLabel
+      typecheck {
+        """
+        case object A extends CustomLabel with MakeLabel
+        """
+      } must not succeed
+    }.pendingUntilFixed(": specs2 can't test this scenario")
+
     "be derivable from the tag name" in {
       case object Device extends MakeLabel
       type Device = Device.type
 
       { Id.of[Device]("gtx9018").toString must beEqualTo("DeviceId(gtx9018)") }
+    }
+
+    "be customisable" in {
+      case object A extends CustomLabel {
+        def label = "Device"
+      }
+      type A = A.type
+
+      { Id.of[A]("gtx9018").toString must beEqualTo("DeviceId(gtx9018)") }
     }
   }
 
@@ -112,6 +133,7 @@ class EidosSpec extends Specification with TypecheckMatchers with ScalaCheck {
       // Specs2 cannot currently test this scenario (the compile time
       // error that Eidos produces is not a type error). To test,
       // uncomment the following line and ensure it fails at compile time
+      // case object A extends UUID with Num
       typecheck {
         """
         case object A extends UUID with Num

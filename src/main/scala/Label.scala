@@ -10,10 +10,30 @@ object Label {
     def label = ""
   }
 
+  private[id] sealed trait LabelDefinitionConflict
+
   // SI-9689 affects repl usage, fixed in scala 2.12
   trait MakeLabel extends Product {
-    implicit def l = new Label[this.type] {
+    // See eidos.id.Format.UUID for an explanation of this
+    // format: off
+    final def `"In Eidos, you can only extend one of MakeLabel or CustomLabel"`
+        : LabelDefinitionConflict = null
+
+    implicit final def l = new Label[this.type] {
       def label = productPrefix
+    }
+  }
+
+  trait CustomLabel {
+    final def `"In Eidos, you can only extend one of MakeLabel or CustomLabel"`
+        : LabelDefinitionConflict = null
+    // format: on
+    def label: String
+
+    private def customLabel = label
+
+    implicit final def l = new Label[this.type] {
+      def label = customLabel
     }
   }
 }
