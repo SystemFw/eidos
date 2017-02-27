@@ -1,4 +1,5 @@
 package eidos
+package id
 
 import org.specs2.mutable.Specification
 import org.specs2.execute.Typecheck._
@@ -9,8 +10,6 @@ import org.scalacheck.Gen.{uuid, alphaNumStr, numStr}
 
 class EidosSpec extends Specification with TypecheckMatchers with ScalaCheck {
   "In Eidos:".br.tab(1)
-
-  import id._
 
   "IDs" should {
     "be parameterised by a tag" in {
@@ -36,7 +35,7 @@ class EidosSpec extends Specification with TypecheckMatchers with ScalaCheck {
       type A = A.type
 
       object B {
-        implicit def v: Validate[B] = null
+        implicit def v: Build.Validated[B] = null
       }
       type B = B.type
 
@@ -66,7 +65,7 @@ class EidosSpec extends Specification with TypecheckMatchers with ScalaCheck {
       type NoValidation = NoValidation.type
 
       case object ValidationRequired {
-        implicit def validator = new Validate[ValidationRequired] {
+        implicit def validator = new Build.Validated[ValidationRequired] {
           def validate(v: String) =
             if (v == "nonvalid") None else Some(v)
         }
