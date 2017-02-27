@@ -149,6 +149,16 @@ class EidosSpec extends Specification with TypecheckMatchers with ScalaCheck {
         Id.of[A](s).map(_.value) must beSome(s)
       }
     }
+
+    "allow validating with a custom Regex" in {
+      case object A extends Regex {
+        def pattern = "abc"
+      }
+      type A = A.type
+
+      Id.of[A]("abc").map(_.value) must beSome("abc")
+      Id.of[A]("abcd") must beNone
+    }
   }
 
   implicit class NonEmptyStringGen(g: org.scalacheck.Gen[String]) {
