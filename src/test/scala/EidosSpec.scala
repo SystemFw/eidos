@@ -192,11 +192,11 @@ class EidosSpec extends Specification with TypecheckMatchers with ScalaCheck {
 
     "allow validating with a custom Regex" in {
       case object A extends Regex {
-        def pattern = "abc"
+        def pattern = "(abc)+12"
       }
       type A = A.type
 
-      Id.of[A]("abc").map(_.value) must beSome("abc")
+      Id.of[A]("abcabc12").map(_.value) must beSome("abcabc12")
       Id.of[A]("abcd") must beNone
     }
   }
