@@ -91,21 +91,29 @@ object id {
     final def `"In Eidos, You can only extend one validation format at the time!"`
         : ValidationFormatDefinitionConflict = null
 
-    final override def format = ""
+    final override def format =
+      "[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}"
+  }
+
+  trait NonBlank extends Format {
+    final def `"In Eidos, You can only extend one validation format at the time!"`
+        : ValidationFormatDefinitionConflict = null
+
+    final override def format = """[^\s]+"""
   }
 
   trait AlphaNum extends Format {
     final def `"In Eidos, You can only extend one validation format at the time!"`
         : ValidationFormatDefinitionConflict = null
 
-    final override def format = ""
+    final override def format = """\p{Alnum}+"""
   }
 
   trait Num extends Format {
     final def `"In Eidos, You can only extend one validation format at the time!"`
         : ValidationFormatDefinitionConflict = null
 
-    final override def format = ""
+    final override def format = """\d+"""
   }
 
   trait Regex extends Format {
@@ -116,4 +124,9 @@ object id {
 
     final override def format = pattern
   } // format: on
+
+  case object A extends AlphaNum
+
+  val a = Id.of[A.type]("    ")
+
 }

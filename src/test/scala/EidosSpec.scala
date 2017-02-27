@@ -3,8 +3,11 @@ package eidos
 import org.specs2.mutable.Specification
 import org.specs2.execute.Typecheck._
 import org.specs2.matcher.TypecheckMatchers
+import org.specs2.ScalaCheck
+import org.scalacheck.Prop.forAll
+import org.scalacheck.Gen.{uuid, alphaNumStr, numStr}
 
-class EidosSpec extends Specification with TypecheckMatchers {
+class EidosSpec extends Specification with TypecheckMatchers with ScalaCheck {
   "In Eidos:".br.tab(1)
 
   import id._
@@ -72,7 +75,7 @@ class EidosSpec extends Specification with TypecheckMatchers {
 
       // format: off
       { typecheck("""val a: Id[NoValidation] = Id.of[NoValidation]("whatever")""") must succeed }
-      { Id.of[ValidationRequired]("valid").map(_.toString) should beSome("Id(valid)") }
+      { Id.of[ValidationRequired]("valid").map(_.value) should beSome("valid") }
       { Id.of[ValidationRequired]("nonvalid") should beNone }
       // format: on
     }
@@ -98,6 +101,58 @@ class EidosSpec extends Specification with TypecheckMatchers {
         """
       } must not succeed
     }.pendingUntilFixed(": specs2 can't test this scenario")
-    // "allow validation a uuid" and so on for the other formats
+
+    "allow validating a nonempty string" in {
+      case object A extends NonBlank
+      type A = A.type
+
+      Id.of[A]("") must beNone
+      Id.of[A]("    ") must beNone
+      Id.of[A]("fff") must beSome
+    }
+
+    "allow validating a numeric string" in {
+      case object A extends Num
+      type A = A.type
+
+      Id.of[A]("134f") must beNone
+
+      // Scalacheck props MUST be the last assertion
+      // Multiple props MUST be linked together by && or ||
+      forAll(numStr.nonEmpty) { s =>
+        Id.of[A](s).map(_.value) must beSome(s)
+      }
+    }
+
+    "allow validating an alphanumeric string" in {
+      case object A extends AlphaNum
+      type A = A.type
+
+      Id.of[A]("!") must beNone
+
+      // Scalacheck props MUST be the last assertion
+      // Multiple props MUST be linked together by && or ||
+      forAll(alphaNumStr.nonEmpty) { s =>
+        Id.of[A](s).map(_.value) must beSome(s)
+      }
+    }
+
+    "allow validating a UUID" in {
+      case object A extends UUID
+      type A = A.type
+
+      Id.of[A]("!") must beNone
+
+      // Scalacheck props MUST be the last assertion
+      // Multiple props MUST be linked together by && or ||
+      forAll(uuid) { u =>
+        val s = u.toString
+        Id.of[A](s).map(_.value) must beSome(s)
+      }
+    }
+  }
+
+  implicit class NonEmptyStringGen(g: org.scalacheck.Gen[String]) {
+    def nonEmpty = g suchThat (!_.isEmpty)
   }
 }
