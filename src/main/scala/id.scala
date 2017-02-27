@@ -1,7 +1,8 @@
 package eidos
 
 object id {
-
+  // sealed abstract case class to build newtypes
+  // https://gist.github.com/tpolecat/a5cb0dc9adeacc93f846835ed21c92d2
   sealed abstract case class Id[A](value: String) {
     protected def label: Label[A]
 
