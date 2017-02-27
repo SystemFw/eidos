@@ -13,10 +13,10 @@ class EidosSpec extends Specification with TypecheckMatchers with ScalaCheck {
 
   "IDs" should {
     "be parameterised by a tag" in {
-      object A
+      case object A
       type A = A.type
 
-      object B
+      case object B
       type B = B.type
 
       def a: Id[A] = ???
@@ -31,10 +31,10 @@ class EidosSpec extends Specification with TypecheckMatchers with ScalaCheck {
     "be created thorugh an explicitly typed call to `of`" in {
       // for documentation purposed only
       // limitation due to  SI-7371 and SI-7234
-      object A
+      case object A
       type A = A.type
 
-      object B {
+      case object B {
         implicit def v: Build.Validated[B] = null
       }
       type B = B.type
@@ -46,10 +46,10 @@ class EidosSpec extends Specification with TypecheckMatchers with ScalaCheck {
     }
 
     "have an optional label attached to it" in {
-      object B
+      case object B
       type B = B.type
 
-      object C {
+      case object C {
         implicit def ev = new Label[C] {
           def label = "Custom"
         }
@@ -61,7 +61,7 @@ class EidosSpec extends Specification with TypecheckMatchers with ScalaCheck {
     }
 
     "be validated against an optional schema on creation" in {
-      object NoValidation
+      case object NoValidation
       type NoValidation = NoValidation.type
 
       case object ValidationRequired {
@@ -77,6 +77,24 @@ class EidosSpec extends Specification with TypecheckMatchers with ScalaCheck {
       { Id.of[ValidationRequired]("valid").map(_.value) should beSome("valid") }
       { Id.of[ValidationRequired]("nonvalid") should beNone }
       // format: on
+    }
+  }
+
+  "Tag" should {
+    "be case objects" in {
+      trait Trait
+
+      object Object
+      type Object = Object.type
+
+      case object CaseObject
+      type CaseObject = CaseObject.type
+
+      val errorMessage = "Tags for Eidos IDs must be case objects"
+
+      { typecheck("""Id.of[Trait]("")""") must failWith(errorMessage) }
+      { typecheck("""Id.of[Object]("")""") must failWith(errorMessage) }
+      { typecheck("""Id.of[CaseObject]("")""") must succeed }
     }
   }
 
@@ -96,7 +114,7 @@ class EidosSpec extends Specification with TypecheckMatchers with ScalaCheck {
       // uncomment the following line and ensure it fails at compile time
       typecheck {
         """
-        object A extends UUID with Num
+        case object A extends UUID with Num
         """
       } must not succeed
     }.pendingUntilFixed(": specs2 can't test this scenario")

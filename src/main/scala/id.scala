@@ -1,7 +1,6 @@
 package eidos
 package id
 
-
 // sealed abstract case class to build newtypes
 // https://gist.github.com/tpolecat/a5cb0dc9adeacc93f846835ed21c92d2
 sealed abstract case class Id[A](value: String) {
@@ -20,6 +19,13 @@ object Id {
   // merely adding a type signature to the returned value is not enough
   // one should instead always use Id.of[TypeOfTheTag]
   def of[A](v: String)(implicit l: Label[A] = Label.default[A],
-    b: Build[A] = Build.default[A]): b.Out =
+                       b: Build[A] = Build.default[A],
+                       ev: IsCaseObject[A]): b.Out =
     b.build(v, l)
+
+  @annotation.implicitNotFound("Tags for Eidos IDs must be case objects")
+  private sealed trait IsCaseObject[A]
+  private object IsCaseObject {
+    implicit def ev[A <: Singleton with Product]: IsCaseObject[A] = null
+  }
 }

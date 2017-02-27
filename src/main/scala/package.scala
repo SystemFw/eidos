@@ -7,6 +7,5 @@ package object eidos {
   type UUID = id.Format.UUID
   type Regex = id.Format.Regex
 
-
   val Id = id.Id
 }
