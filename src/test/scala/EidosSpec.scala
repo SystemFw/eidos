@@ -90,10 +90,11 @@ class EidosSpec extends Specification with TypecheckMatchers with ScalaCheck {
       case object CaseObject
       type CaseObject = CaseObject.type
 
-      val errorMessage = "Tags for Eidos IDs must be case objects"
+      def errorMessage(name: String) =
+        s"$name is not a valid Eidos Tag. Declare it to be a case object to fix this error"
 
-      { typecheck("""Id.of[Trait]("")""") must failWith(errorMessage) }
-      { typecheck("""Id.of[Object]("")""") must failWith(errorMessage) }
+      { typecheck("""Id.of[Trait]("")""") must failWith(errorMessage("Trait")) }
+      { typecheck("""Id.of[Object]("")""") must failWith(errorMessage("Object")) }
       { typecheck("""Id.of[CaseObject]("")""") must succeed }
     }
   }
