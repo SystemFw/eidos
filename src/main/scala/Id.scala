@@ -15,7 +15,7 @@ object Id {
     override def label = l
   }
 
-  // `of` requires explicit type application due to SI-7371 to SI-7234
+  // `of` requires explicit type application due to SI-7371 and SI-7234
   // merely adding a type signature to the returned value is not enough
   // one should instead always use Id.of[TypeOfTheTag]
   def of[A](v: String)(implicit l: Label[A] = Label.default[A],
