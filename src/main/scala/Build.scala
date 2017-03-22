@@ -7,8 +7,9 @@ sealed trait Build[A] {
 }
 
 object Build {
-  // Inferred type: default[A]: Build[A]{type Out = Id[A]}
-  private[id] def default[A] = new Build[A] {
+  private[id] type Aux[I, O] = Build[I] { type Out = O }
+
+  private[id] def default[A]: Aux[A, Id[A]] = new Build[A] {
     type Out = Id[A]
     override def build(v: String, l: Label[A]): Out = Id.unsafeCreate(v, l)
   }

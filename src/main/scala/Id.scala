@@ -23,7 +23,8 @@ object Id {
                        ev: IsCaseObject[A]): b.Out =
     b.build(v, l)
 
-  @annotation.implicitNotFound("${A} is not a valid Eidos Tag. Declare it to be a case object to fix this error")
+  @annotation.implicitNotFound(
+    "${A} is not a valid Eidos Tag. Declare it to be a case object to fix this error")
   private sealed trait IsCaseObject[A]
   private object IsCaseObject {
     implicit def ev[A <: Singleton with Product]: IsCaseObject[A] = null
