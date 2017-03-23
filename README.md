@@ -1,6 +1,11 @@
 # Eidos
-A tiny and principled library for modelling IDs. We can do better than `String`.
-```Scala
+Eidos is a tiny and principled library for modelling IDs.
+It does one thing and does it well, allowing you to build tagged IDs
+with _à la carte_ pretty-printing and validation, and an emphasis on
+type safety and correct-by-construction code.  We can do better than
+`String`.
+
+```scala
 import eidos._
 
 case object QnD
@@ -10,8 +15,8 @@ case object Customer extends MakeLabel with UUID
 type Customer = Customer.type
 
 case object Device extends CustomLabel with Regex {
-  def pattern = "(abc)+12"
-  def label = "Phone"
+ def pattern = "(abc)+12"
+ def label = "Phone"
 }
 type Device = Device.type
 
@@ -29,3 +34,11 @@ res3: Option[Id[Customer]] = None
 scala> Id.of[Device]("abcabc12")
 res4: Option[Id[Device]] = Some(PhoneId(abcabc12))
 ```
+## Getting Eidos
+The first release is coming soon. You can clone the repository to
+experiment with the library in the meantime.
+
+## Documentation
+Have a look at the [User Guide](docs/guide.md) for detailed
+documentation
+

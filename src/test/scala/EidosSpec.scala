@@ -28,9 +28,8 @@ class EidosSpec extends Specification with TypecheckMatchers with ScalaCheck {
       { typecheck("foo(a)") must succeed }
     }
 
-    "be created thorugh an explicitly typed call to `of`" in {
-      // for documentation purposed only
-      // limitation due to  SI-7371 and SI-7234
+    "be created through an explicitly typed call to `of`" in {
+      // for documentation purposes only
       case object A
       type A = A.type
 

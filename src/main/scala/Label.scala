@@ -12,7 +12,6 @@ object Label {
 
   private[id] sealed trait LabelDefinitionConflict
 
-  // SI-9689 affects repl usage, fixed in scala 2.12
   trait MakeLabel extends Product {
     // See eidos.id.Format.UUID for an explanation of this
     // format: off
