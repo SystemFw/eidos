@@ -6,12 +6,13 @@ sealed trait Format {
 
   val regex = format.r
 
-  implicit final def validator = new Build.Validated[this.type] {
-    def validate(s: String) = s match {
-      case regex(_ *) => Some(s)
-      case _ => None
+  implicit final def validator: Build.Validated[this.type] =
+    new Build.Validated[this.type] {
+      def validate(s: String) = s match {
+        case regex(_ *) => Some(s)
+        case _ => None
+      }
     }
-  }
 
 }
 

@@ -15,7 +15,6 @@ object Id {
     override def label = l
   }
 
-
   // Due to the use of dependent types, `of` requires explicit type application,
   // merely adding a type signature to the returned value is not enough:
   // one should instead always use Id.of[TypeOfTheTag]

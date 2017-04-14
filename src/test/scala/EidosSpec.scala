@@ -49,7 +49,7 @@ class EidosSpec extends Specification with TypecheckMatchers with ScalaCheck {
       type B = B.type
 
       case object C {
-        implicit def ev = new Label[C] {
+        implicit def ev: Label[C] = new Label[C] {
           def label = "Custom"
         }
       }
@@ -64,10 +64,11 @@ class EidosSpec extends Specification with TypecheckMatchers with ScalaCheck {
       type NoValidation = NoValidation.type
 
       case object ValidationRequired {
-        implicit def validator = new Build.Validated[ValidationRequired] {
-          def validate(v: String) =
-            if (v == "nonvalid") None else Some(v)
-        }
+        implicit def validator: Build.Validated[ValidationRequired] =
+          new Build.Validated[ValidationRequired] {
+            def validate(v: String) =
+              if (v == "nonvalid") None else Some(v)
+          }
       }
       type ValidationRequired = ValidationRequired.type
 
@@ -92,9 +93,11 @@ class EidosSpec extends Specification with TypecheckMatchers with ScalaCheck {
       def errorMessage(name: String) =
         s"$name is not a valid Eidos Tag. Declare it to be a case object to fix this error"
 
+      // format: off
       { typecheck("""Id.of[Trait]("")""") must failWith(errorMessage("Trait")) }
       { typecheck("""Id.of[Object]("")""") must failWith(errorMessage("Object")) }
       { typecheck("""Id.of[CaseObject]("")""") must succeed }
+      // format: on
     }
   }
 

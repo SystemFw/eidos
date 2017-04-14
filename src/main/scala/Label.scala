@@ -18,7 +18,7 @@ object Label {
     final def `"In Eidos, you can only extend one of MakeLabel or CustomLabel"`
         : LabelDefinitionConflict = null
 
-    implicit final def l = new Label[this.type] {
+    implicit final def l: Label[this.type] = new Label[this.type] {
       def label = productPrefix
     }
   }
@@ -31,7 +31,7 @@ object Label {
 
     private def customLabel = label
 
-    implicit final def l = new Label[this.type] {
+    implicit final def l: Label[this.type] = new Label[this.type] {
       def label = customLabel
     }
   }
