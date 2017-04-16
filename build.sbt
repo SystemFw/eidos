@@ -9,7 +9,8 @@ lazy val root = (project in file(".")).
 lazy val commonSettings = Seq(
   organization := "org.systemfw",
   name := "eidos",
-  scalaVersion := "2.11.8"
+  scalaVersion := "2.11.8",
+  crossScalaVersions := Seq("2.11.8", "2.12.1")
 )
 
 lazy val compilerOptions =
