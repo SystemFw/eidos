@@ -310,7 +310,7 @@ a purely functional library, and it will never throw exceptions).
  scala> Id.of[Foo]("anything can go here")
  Id("anything can go here")
 
- scala> Id.of[Foo]("") // including blank strings
+ scala> Id.of[Foo]("") // including empty strings
  Id("")
 
  scala> Id.of[Foo]("   ") // and blank strings
