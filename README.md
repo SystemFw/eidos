@@ -35,8 +35,13 @@ scala> Id.of[Device]("abcabc12")
 res4: Option[Id[Device]] = Some(PhoneId(abcabc12))
 ```
 ## Getting Eidos
-The first release is coming soon. You can clone the repository to
-experiment with the library in the meantime.
+
+Add the following to your build.sbt. Builds are available for scala
+2.11.x and 2.12.x
+
+``` scala
+libraryDependencies += "org.systemfw" %% eidos % "0.1"
+```
 
 ## Documentation
 Have a look at the [User Guide](docs/guide.md) for detailed

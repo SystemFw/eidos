@@ -43,15 +43,14 @@ import ReleaseTransformations._
 
 lazy val publishSettings = {
   val username = "SystemFw"
-  val repo = "eidos"
 
   Seq(
-    homepage := Some(url(s"https://github.com/$username/$repo")),
+    homepage := Some(url(s"https://github.com/$username/${name.value}")),
     licenses += "MIT" -> url("http://opensource.org/licenses/MIT"),
     scmInfo := Some(
       ScmInfo(
-        url(s"https://github.com/$username/$repo"),
-        s"git@github.com:$username/$repo.git"
+        url(s"https://github.com/$username/${name.value}"),
+        s"git@github.com:$username/${name.value}.git"
       )
     ),
     publishMavenStyle := true,
