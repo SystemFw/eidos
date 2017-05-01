@@ -51,14 +51,16 @@ lazy val publishSettings = {
     scmInfo := Some(
       ScmInfo(
         url(s"https://github.com/$username/$repo"),
-        s"git@github.com:$username/$repo.git")
+        s"git@github.com:$username/$repo.git"
+      )
     ),
     publishMavenStyle := true,
     publishArtifact in Test := false,
     publishTo := Some(
       if (isSnapshot.value)
         Opts.resolver.sonatypeSnapshots
-      else Opts.resolver.sonatypeStaging),
+      else Opts.resolver.sonatypeStaging
+    ),
     pomExtra := (
       <developers>
         <developer>
@@ -74,11 +76,11 @@ lazy val publishSettings = {
     checkSnapshotDependencies,
     inquireVersions,
     runClean,
-    releaseStepCommand("package"),
+    runTest,
     setReleaseVersion,
     commitReleaseVersion,
     tagRelease,
-    releaseStepCommand("publishSigned"),
+    publishArtifacts,
     setNextVersion,
     commitNextVersion,
     releaseStepCommand("sonatypeReleaseAll"), 
