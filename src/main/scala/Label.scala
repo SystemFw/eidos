@@ -12,15 +12,16 @@ object Label {
 
   private[id] sealed trait LabelDefinitionConflict
 
-  trait MakeLabel extends Product {
+  trait MakeLabel { self =>
     // See eidos.id.Format.UUID for an explanation of this
     // format: off
     final def `"In Eidos, you can only extend one of MakeLabel or CustomLabel"`
         : LabelDefinitionConflict = null
 
-    implicit final def l: Label[this.type] = new Label[this.type] {
-      def label = productPrefix
-    }
+    implicit final def l(implicit ev: self.type <:< Product): Label[this.type] =
+      new Label[this.type] {
+        def label = self.productPrefix
+      }
   }
 
   trait CustomLabel {
