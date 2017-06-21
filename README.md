@@ -40,7 +40,7 @@ Add the following to your build.sbt. Builds are available for scala
 2.11.x and 2.12.x
 
 ``` scala
-libraryDependencies += "org.systemfw" %% "eidos" % "0.1"
+libraryDependencies += "org.systemfw" %% "eidos" % "0.1.1"
 ```
 
 ## Documentation
