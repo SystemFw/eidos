@@ -1,11 +1,10 @@
-lazy val root = (project in file(".")).
-  settings(
-    commonSettings,
-    compilerOptions,
-    consoleSettings,
-    testSettings,
-    publishSettings
-  )
+lazy val root = (project in file(".")).settings(
+  commonSettings,
+  compilerOptions,
+  consoleSettings,
+  testSettings,
+  publishSettings
+)
 
 lazy val commonSettings = Seq(
   organization := "org.systemfw",
@@ -18,7 +17,8 @@ lazy val compilerOptions =
   scalacOptions ++= Seq(
     "-unchecked",
     "-deprecation",
-    "-encoding", "utf8"
+    "-encoding",
+    "utf8"
   )
 
 lazy val consoleSettings =
@@ -83,6 +83,7 @@ lazy val publishSettings = {
       setNextVersion,
       commitNextVersion,
       releaseStepCommand("sonatypeReleaseAll"),
-      pushChanges)
+      pushChanges
+    )
   )
 }
