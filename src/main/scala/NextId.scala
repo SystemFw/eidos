@@ -23,11 +23,11 @@ object Id {
     override def v = contents
   }
 
-  class Curried[Tag]() {
-    def apply[V](v: V)(implicit b: Build.Aux[Tag, V], l: Label[Tag] = Label.default[Tag], ev: IsCaseObject[Tag]) = b.build(v, l)
+  class Curried[Tag, V, O](val b: Build.Aux2[Tag,V, O]) {
+    def is(v: V)(implicit ev: IsCaseObject[Tag], l: Label[Tag] = Label.default[Tag]): O = b.build(v, l)
   }
 
-  def of[Tag] = new Curried[Tag]
+  def of[Tag](implicit ev: Build[Tag]) = new Curried[Tag, ev.V, ev.Out](ev)
 
   @annotation.implicitNotFound(
     "${A} is not a valid Eidos Tag. Declare it to be a case object to fix this error")
@@ -108,6 +108,15 @@ object Build {
       override def build(v: V, l: Label[Tag]): Out = Id.unsafeCreate(v,l)
     }
   }
+  trait PosInts {
+    private type Tag = this.type
+    implicit def b: Build.Aux2[Tag, Int, Option[Id.Aux[Tag, Int]]] = new Build[Tag] {
+      type Out = Option[Id.Aux[Tag, V]]
+      type V = Int
+
+      override def build(v: V, l: Label[Tag]): Out = if (v > 0) Option(Id.unsafeCreate(v,l)) else None
+    }
+  }
 }
 
 object Tags {
@@ -118,7 +127,7 @@ object T {
   case object Foo extends Tags.Default
   type Foo = Foo.type
 
-  val a: Id[Foo] = Id.of[Foo]("hello")
+  val a: Id[Foo] = Id.of[Foo].is("hello")
   val b = a.value
 
   def foo(id: Id[Foo]): String = {
@@ -128,7 +137,13 @@ object T {
   case object Bar extends Build.Ints with Label.MakeLabel
   type Bar = Bar.type
 
-  val c = Id.of[Bar](1)
+  val c = Id.of[Bar].is(1)
   val d = c.value
+
+  case object Baz extends Build.PosInts
+  type Baz = Baz.type
+
+  val e = Id.of[Baz].is(3)
+  val f = Id.of[Baz].is(-1)
 }
 
