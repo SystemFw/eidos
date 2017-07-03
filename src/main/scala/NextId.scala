@@ -24,7 +24,7 @@ object Id {
   }
 
   class Curried[Tag]() {
-    def apply[V](v: V)(implicit b: Build.Aux[Tag, V], l: Label[Tag], ev: IsCaseObject[Tag]) = b.build(v, l)
+    def apply[V](v: V)(implicit b: Build.Aux[Tag, V], l: Label[Tag] = Label.default[Tag], ev: IsCaseObject[Tag]) = b.build(v, l)
   }
 
   def of[Tag] = new Curried[Tag]
@@ -75,17 +75,6 @@ object Label {
       def label = customLabel
     }
   }
-
-  trait DefaultLabel {
-    // format: off
-    final def `"In Eidos, you can only extend one of MakeLabel or CustomLabel"`
-        : LabelDefinitionConflict = null
-    // format: on
-
-    implicit final def l: Label[this.type] = new Label[this.type] {
-      def label = ""
-    }
-  }
 }
 
 @annotation.implicitNotFound(
@@ -122,7 +111,7 @@ object Build {
 }
 
 object Tags {
-  trait Default extends Build.Default with Label.DefaultLabel
+  trait Default extends Build.Default
 }
 
 object T {
