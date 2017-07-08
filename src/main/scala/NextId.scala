@@ -146,4 +146,29 @@ object T {
   val e = Id.of[Baz].is(3)
   val f = Id.of[Baz].is(-1)
 }
+object Naming {
+// Id[User]("hello")
 
+// Id[User].mk("hello")
+// Id[User].make("hello")
+// Id[User].build("hello")
+// Id[User].value("hello")
+// Id[User].withValue("hello")
+// Id[User].of("hello")
+// Id[User].v("hello")
+// Id[User].new_("hello")
+// Id[User].with_("hello")
+// Id[User].is("hello")
+
+// Id.of[User].mk("hello")
+// Id.of[User].make("hello")
+// Id.of[User].build("hello")
+// Id.of[User].value("hello")
+// Id.of[User].withValue("hello")
+// Id.of[User].of("hello")
+// Id.of[User].v("hello")
+// Id.of[User].new_("hello")
+// Id.of[User].with_("hello")
+// Id.of[User].is("hello")
+
+}
