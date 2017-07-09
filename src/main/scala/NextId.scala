@@ -24,10 +24,15 @@ object Id {
   }
 
   class Curried[Tag, V, O](val b: Build.Aux2[Tag,V, O]) {
-    def is(v: V)(implicit ev: IsCaseObject[Tag], l: Label[Tag] = Label.default[Tag]): O = b.build(v, l)
+    def of(value: V)(implicit ev: IsCaseObject[Tag], l: Label[Tag] = Label.default[Tag]): O = b.build(value, l)
   }
 
-  def of[Tag](implicit ev: Build[Tag]) = new Curried[Tag, ev.V, ev.Out](ev)
+  def apply[Tag](implicit ev: Build[Tag]) = new Curried[Tag, ev.V, ev.Out](ev)
+
+  def of[V](value:V)(implicit ev: ErrorCall): Unit = ()
+  @annotation.implicitNotFound(
+    "Specify the type of the tag for your Id")
+  private sealed trait ErrorCall
 
   @annotation.implicitNotFound(
     "${A} is not a valid Eidos Tag. Declare it to be a case object to fix this error")
@@ -129,7 +134,7 @@ object T {
   case object Foo extends Tags.Default
   type Foo = Foo.type
 
-  val a: Id[Foo] = Id.of[Foo].is("hello")
+  val a: Id[Foo] = Id[Foo].of(value = "hello")
   val b = a.value
 
   def foo(id: Id[Foo]): String = {
@@ -139,38 +144,13 @@ object T {
   case object Bar extends Build.Ints with Label.MakeLabel
   type Bar = Bar.type
 
-  val c = Id.of[Bar].is(1)
+  val c = Id[Bar].of(1)
   val d = c.value
 
   case object Baz extends Build.PosInts
   type Baz = Baz.type
 
-  val e = Id.of[Baz].is(3)
-  val f = Id.of[Baz].is(-1)
+  val e = Id[Baz].of(value = 3)
+  val f = Id[Baz].of(-1)
 }
-object Naming {
-// Id[User]("hello")
 
-// Id[User].mk("hello")
-// Id[User].make("hello")
-// Id[User].build("hello")
-// Id[User].value("hello")
-// Id[User].withValue("hello")
-// Id[User].of("hello")
-// Id[User].v("hello")
-// Id[User].new_("hello")
-// Id[User].with_("hello")
-// Id[User].is("hello")
-
-// Id.of[User].mk("hello")
-// Id.of[User].make("hello")
-// Id.of[User].build("hello")
-// Id.of[User].value("hello")
-// Id.of[User].withValue("hello")
-// Id.of[User].of("hello")
-// Id.of[User].v("hello")
-// Id.of[User].new_("hello")
-// Id.of[User].with_("hello")
-// Id.of[User].is("hello")
-
-}
