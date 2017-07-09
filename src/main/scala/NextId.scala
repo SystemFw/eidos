@@ -2,14 +2,12 @@ package next
 // sealed abstract case class to build newtypes
 // https://gist.github.com/tpolecat/a5cb0dc9adeacc93f846835ed21c92d2
 sealed abstract case class Id[Tag]() {
-  protected def label: Label[Tag]
+  protected def label: String
 
   override def toString =
-    s"${label.label}${productPrefix}(${v})"
+    s"${label}${productPrefix}(${v})"
 
-  type V
-
-  def v: V
+  protected def v: Any
 
   def value(implicit ev: Build[Tag]): ev.V = v.asInstanceOf[ev.V]
 }
@@ -19,7 +17,7 @@ object Id {
 
   private [next] def unsafeCreate[Tag, V_](contents: V_, l: Label[Tag]) = new Id[Tag]() {
     type V = V_
-    override def label = l
+    override def label = l.label
     override def v = contents
   }
 
