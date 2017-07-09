@@ -89,10 +89,12 @@ object Build {
   type Aux[Tag, V_] = Build[Tag] { type V = V_ }
   type Aux2[Tag, V_, O] = Build[Tag] { type V = V_ ; type Out = O}
 
+  type Simple[Tag, Contents] = Aux2[Tag, Contents, Id.Aux[Tag, Contents]]
+  type Wrapped[Tag, Contents] = Aux2[Tag, Contents, Option[Id.Aux[Tag, Contents]]]
 
   trait Default {
     private type Tag = this.type
-    implicit def b: Build.Aux2[Tag, String, Id.Aux[Tag, String]] = new Build[Tag] {
+    implicit def b: Simple[Tag, String] = new Build[Tag] {
       type Out = Id.Aux[Tag, String]
       type V = String
 
@@ -101,7 +103,7 @@ object Build {
   }
   trait Ints {
     private type Tag = this.type
-    implicit def b: Build.Aux2[Tag, Int, Id.Aux[Tag, Int]] = new Build[Tag] {
+    implicit def b: Simple[Tag, Int] = new Build[Tag] {
       type Out = Id.Aux[Tag, V]
       type V = Int
 
@@ -110,7 +112,7 @@ object Build {
   }
   trait PosInts {
     private type Tag = this.type
-    implicit def b: Build.Aux2[Tag, Int, Option[Id.Aux[Tag, Int]]] = new Build[Tag] {
+    implicit def b: Wrapped[Tag, Int] = new Build[Tag] {
       type Out = Option[Id.Aux[Tag, V]]
       type V = Int
 
