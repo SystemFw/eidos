@@ -21,16 +21,23 @@ object Id {
     override def v = contents
   }
 
-  class Curried[Tag, V, O](val b: Build.Aux2[Tag,V, O]) {
-    def of(value: V)(implicit ev: IsCaseObject[Tag], l: Label[Tag] = Label.default[Tag]): O = b.build(value, l)
-  }
-
+  // first syntax: Id[User].of(1)
   def apply[Tag](implicit ev: Build[Tag]) = new Curried[Tag, ev.V, ev.Out](ev)
 
-  def of[V](value:V)(implicit ev: ErrorCall): Unit = ()
-  @annotation.implicitNotFound(
-    "Specify the type of the tag for your Id")
-  private sealed trait ErrorCall
+  class Curried[Tag, V, O](val b: Build.Aux2[Tag,V, O]) {
+    def of(value: V)(implicit ev: IsCaseObject[Tag], l: Label[Tag] = Label.default[Tag]): O = b.build(value, l)
+    def apply(value: V)(implicit ev: IsCaseObject[Tag], l: Label[Tag] = Label.default[Tag]): O = b.build(value, l)
+
+  }
+
+  // second syntax: Id.of[User](1)
+
+  class Carrier[Tag]
+  object Carrier {
+    implicit def conv[Tag](c: Carrier[Tag])(implicit ev: Build[Tag]): Curried[Tag, ev.V, ev.Out] =
+      new Curried[Tag, ev.V, ev.Out](ev)
+  }
+  def of[Tag]: Carrier[Tag] = new Carrier[Tag]
 
   @annotation.implicitNotFound(
     "${A} is not a valid Eidos Tag. Declare it to be a case object to fix this error")
@@ -90,6 +97,8 @@ sealed trait Build[Tag] {
 }
 object Build {
   type Aux[Tag, V_] = Build[Tag] { type V = V_ }
+
+  @annotation.implicitNotFound("${Tag} is not a valid Eidos Tag. It should extend a Build type")
   type Aux2[Tag, V_, O] = Build[Tag] { type V = V_ ; type Out = O}
 
   type Simple[Tag, Contents] = Aux2[Tag, Contents, Id.Aux[Tag, Contents]]
@@ -150,5 +159,5 @@ object T {
 
   val e = Id[Baz].of(value = 3)
   val f = Id[Baz].of(-1)
+  val tt = Id.of[Baz](1)
 }
-
