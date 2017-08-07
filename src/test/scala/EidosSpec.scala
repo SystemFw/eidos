@@ -11,6 +11,15 @@ import org.scalacheck.Gen.{uuid, alphaNumStr, numStr}
 class EidosSpec extends Specification with TypecheckMatchers with ScalaCheck {
   "In Eidos:".br.tab(1)
 
+  // TODO
+  // error messages when
+  // no case objects
+  // not extending a Build
+  // not specifying a type
+  // multiple types of IDs
+  // type is preserved, also in functions
+  // testing Num formats
+
   "IDs" should {
     "be parameterised by a tag" in {
       case object A
