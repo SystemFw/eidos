@@ -1,13 +1,21 @@
 package eidos
 package id
 
-sealed trait Build[A] {
+// TODO better error message
+@annotation.implicitNotFound(
+    "${Tag} is not a valid Eidos Tag. It should extend a format trait")
+sealed trait Carrier[Tag] {
+  type V
   type Out
-  def build(s: String, l: Label[A]): Out
+
+  def build(v: V, l: Label[Tag]): Out
 }
 
-object Build {
-  private[id] type Aux[I, O] = Build[I] { type Out = O }
+object Carrier {
+  type Aux[Tag, V_, O] = Build[Tag] { type V = V_ ; type Out = O }
+  type Simple[Tag, Contents] = Aux[Tag, Contents, Id[Tag]]
+  type Wrapped[F[_], Tag, Contents] = Aux[Tag, Contents, F[Id[Tag]]]
+
 
   private[id] def default[A]: Aux[A, Id[A]] = new Build[A] {
     type Out = Id[A]
