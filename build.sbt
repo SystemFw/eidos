@@ -9,8 +9,8 @@ lazy val root = (project in file(".")).settings(
 lazy val commonSettings = Seq(
   organization := "org.systemfw",
   name := "eidos",
-  scalaVersion := "2.11.8",
-  crossScalaVersions := Seq("2.11.8", "2.12.1")
+  scalaVersion := "2.11.11",
+  crossScalaVersions := Seq("2.11.11", "2.12.1")
 )
 
 lazy val compilerOptions =
@@ -18,11 +18,22 @@ lazy val compilerOptions =
     "-unchecked",
     "-deprecation",
     "-encoding",
-    "utf8"
+    "utf8",
+    "-target:jvm-1.8",
+    "-feature",
+    "-language:implicitConversions",
+    "-language:higherKinds",
+    "-language:existentials",
+    "-Ypartial-unification",
+    "-Ywarn-unused-import",
+    "-Ywarn-value-discard"
   )
 
-lazy val consoleSettings =
-  initialCommands := s"import eidos._"
+lazy val consoleSettings = Seq(
+  initialCommands := s"import eidos._",
+  scalacOptions in (Compile, console) ~= (_.filterNot(
+    _ == "-Ywarn-unused-import"))
+)
 
 lazy val testSettings = {
   val specs2 = Seq(
