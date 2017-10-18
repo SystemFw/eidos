@@ -43,12 +43,14 @@ class EidosSpec extends Specification with TypecheckMatchers with ScalaCheck {
       type A = A.type
 
       case object B {
-        implicit def v: Build.Validated[B] = null
+        implicit def v: Id.Carrier.Validated[B, String] = null
       }
       type B = B.type
 
-      { typecheck("""val a: Id[A] = Id.of[A]("")""") must succeed }
-      { typecheck("""val b: Option[Id[B]] = Id.of[B]("")""") must succeed }
+      // TODO bottom two tests, we can now test for a specific error msg
+
+      { typecheck("""val a: Id[A] = Id[A].of("")""") must succeed }
+      { typecheck("""val b: Option[Id[B]] = Id[B].of("")""") must succeed }
       { typecheck("""val a: Id[A] = Id.of("")""") must not succeed }
       { typecheck("""val b: Option[Id[B]] = Id.of("")""") must not succeed }
     }
@@ -64,8 +66,8 @@ class EidosSpec extends Specification with TypecheckMatchers with ScalaCheck {
       }
       type C = C.type
 
-      { Id.of[B]("simple").toString must beEqualTo("Id(simple)") }
-      { Id.of[C]("custom").toString must beEqualTo("CustomId(custom)") }
+      { Id[B].of("simple").toString must beEqualTo("Id(simple)") }
+      { Id[C].of("custom").toString must beEqualTo("CustomId(custom)") }
     }
 
     "be validated against an optional schema on creation" in {
@@ -73,8 +75,8 @@ class EidosSpec extends Specification with TypecheckMatchers with ScalaCheck {
       type NoValidation = NoValidation.type
 
       case object ValidationRequired {
-        implicit def validator: Build.Validated[ValidationRequired] =
-          new Build.Validated[ValidationRequired] {
+        implicit def validator: Id.Carrier.Validated[ValidationRequired, String] =
+          new Id.Carrier.Validated[ValidationRequired, String] {
             def validate(v: String) =
               if (v == "nonvalid") None else Some(v)
           }
@@ -82,9 +84,9 @@ class EidosSpec extends Specification with TypecheckMatchers with ScalaCheck {
       type ValidationRequired = ValidationRequired.type
 
       // format: off
-      { typecheck("""val a: Id[NoValidation] = Id.of[NoValidation]("whatever")""") must succeed }
-      { Id.of[ValidationRequired]("valid").map(_.value) should beSome("valid") }
-      { Id.of[ValidationRequired]("nonvalid") should beNone }
+      { typecheck("""val a: Id[NoValidation] = Id[NoValidation].of("whatever")""") must succeed }
+      { Id[ValidationRequired].of("valid").map(_.value) should beSome("valid") }
+      { Id[ValidationRequired].of("nonvalid") should beNone }
       // format: on
     }
   }
@@ -104,9 +106,9 @@ class EidosSpec extends Specification with TypecheckMatchers with ScalaCheck {
         s"$name is not a valid Eidos Tag. Declare it to be a case object to fix this error"
 
       // format: off
-      { typecheck("""Id.of[Trait]("")""") must failWith(errorMessage("Trait")) }
-      { typecheck("""Id.of[Object]("")""") must failWith(errorMessage("Object")) }
-      { typecheck("""Id.of[CaseObject]("")""") must succeed }
+      { typecheck("""Id[Trait].of("")""") must failWith(errorMessage("Trait")) }
+      { typecheck("""Id[Object].of("")""") must failWith(errorMessage("Object")) }
+      { typecheck("""Id[CaseObject].of("")""") must succeed }
       // format: on
     }
   }
@@ -128,7 +130,7 @@ class EidosSpec extends Specification with TypecheckMatchers with ScalaCheck {
       case object Device extends MakeLabel
       type Device = Device.type
 
-      { Id.of[Device]("gtx9018").toString must beEqualTo("DeviceId(gtx9018)") }
+      { Id[Device].of("gtx9018").toString must beEqualTo("DeviceId(gtx9018)") }
     }
 
     "be customisable" in {
@@ -137,7 +139,7 @@ class EidosSpec extends Specification with TypecheckMatchers with ScalaCheck {
       }
       type A = A.type
 
-      { Id.of[A]("gtx9018").toString must beEqualTo("DeviceId(gtx9018)") }
+      { Id[A].of("gtx9018").toString must beEqualTo("DeviceId(gtx9018)") }
     }
   }
 
@@ -158,21 +160,21 @@ class EidosSpec extends Specification with TypecheckMatchers with ScalaCheck {
       case object A extends NonBlank
       type A = A.type
 
-      Id.of[A]("") must beNone
-      Id.of[A]("    ") must beNone
-      Id.of[A]("fff") must beSome
+      Id[A].of("") must beNone
+      Id[A].of("    ") must beNone
+      Id[A].of("fff") must beSome
     }
 
     "allow validating a numeric string" in {
       case object A extends Num
       type A = A.type
 
-      Id.of[A]("134f") must beNone
+      Id[A].of("134f") must beNone
 
       // Scalacheck props MUST be the last assertion
       // Multiple props MUST be linked together by && or ||
       forAll(numStr.nonEmpty) { s =>
-        Id.of[A](s).map(_.value) must beSome(s)
+        Id[A].of(s).map(_.value) must beSome(s)
       }
     }
 
@@ -180,12 +182,12 @@ class EidosSpec extends Specification with TypecheckMatchers with ScalaCheck {
       case object A extends AlphaNum
       type A = A.type
 
-      Id.of[A]("!") must beNone
+      Id[A].of("!") must beNone
 
       // Scalacheck props MUST be the last assertion
       // Multiple props MUST be linked together by && or ||
       forAll(alphaNumStr.nonEmpty) { s =>
-        Id.of[A](s).map(_.value) must beSome(s)
+        Id[A].of(s).map(_.value) must beSome(s)
       }
     }
 
@@ -193,13 +195,13 @@ class EidosSpec extends Specification with TypecheckMatchers with ScalaCheck {
       case object A extends UUID
       type A = A.type
 
-      Id.of[A]("!") must beNone
+      Id[A].of("!") must beNone
 
       // Scalacheck props MUST be the last assertion
       // Multiple props MUST be linked together by && or ||
       forAll(uuid) { u =>
         val s = u.toString
-        Id.of[A](s).map(_.value) must beSome(s)
+        Id[A].of(s).map(_.value) must beSome(s)
       }
     }
 
@@ -209,8 +211,8 @@ class EidosSpec extends Specification with TypecheckMatchers with ScalaCheck {
       }
       type A = A.type
 
-      Id.of[A]("abcabc12").map(_.value) must beSome("abcabc12")
-      Id.of[A]("abcd") must beNone
+      Id[A].of("abcabc12").map(_.value) must beSome("abcabc12")
+      Id[A].of("abcd") must beNone
     }
   }
 
