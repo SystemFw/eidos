@@ -4,11 +4,16 @@ package object eidos {
   type MakeLabel = id.Label.MakeLabel
   type CustomLabel = id.Label.CustomLabel
   // Formats
-  type NonBlank = id.Format.NonBlank
-  type AlphaNum = id.Format.AlphaNum
-  type Num = id.Format.Num
-  type UUID = id.Format.UUID
-  type Regex = id.Format.Regex
+  type NonBlank = id.strings.NonBlank
+  type AlphaNum = id.strings.AlphaNum
+  type Num = id.strings.Num
+  type UUID = id.strings.UUID
+  type Regex = id.strings.Regex
 
   val Id = id.Id
+
+  trait Default {
+    implicit def b: Id.Carrier.Simple[this.type, String] =
+      new Id.Carrier.Simple[this.type, String] {}
+  }
 }

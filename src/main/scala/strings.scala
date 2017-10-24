@@ -1,23 +1,22 @@
 package eidos
 package id
 
-sealed trait Format {
-  def format: String
+object strings {
+  sealed trait Format {
+    def format: String
 
-  val regex = format.r
+    val regex = format.r
 
-  implicit final def validator: Id.Carrier.Validated[this.type, String] =
-    new Id.Carrier.Validated[this.type, String] {
-      def validate(s: String) = s match {
-        case regex(_ *) => Some(s)
-        case _ => None
+    implicit final def validator: Id.Carrier.Validated[this.type, String] =
+      new Id.Carrier.Validated[this.type, String] {
+        def validate(s: String) = s match {
+          case regex(_ *) => Some(s)
+          case _ => None
+        }
       }
-    }
+  }
 
-}
-
-object Format {
-  private[id] sealed trait ValidationFormatDefinitionConflict
+  private[strings] sealed trait ValidationFormatDefinitionConflict
 
   // format: off
   trait UUID extends Format {
